@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
     public float speed;
     public float movementSpeed;
+    private float movementInput;
 
     public int score;
     public TextMeshProUGUI scoreTxt;
@@ -18,6 +19,8 @@ public class Player : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        speed = 10;
+        movementSpeed = 5;
         rb = GetComponent<Rigidbody>();
     } // end of Start method
 
@@ -25,21 +28,30 @@ public class Player : MonoBehaviour
     void Update()
     {
 
-        speedOffset += 0.001; // To increase player's speed over time to increase difficulty
-
-        if (gameIsOver)
+        if (!gameIsOver)
         {
-            rb.linearVelocity = new Vector3(0, 0, 0);
-        } else
-        {
-            float movementInput = Input.GetAxis("Horizontal");
-
-            rb.linearVelocity = new Vector3((float)(speed + speedOffset), 
-                rb.linearVelocity.y, 
-                -movementInput * ((float)(movementSpeed + speedOffset/2)));
+            movementInput = Input.GetAxis("Horizontal");
         }
 
     } // end of Update method
+
+    void FixedUpdate()
+    {
+        speedOffset += (Time.fixedDeltaTime * 0.6); // To increase player's speed over time to increase difficulty
+
+        if (gameIsOver)
+        {
+            rb.linearVelocity = Vector3.zero;
+        }
+        else
+        {
+            rb.linearVelocity = new Vector3(
+                (float)(speed + speedOffset),
+                rb.linearVelocity.y,
+                -movementInput * (float)(movementSpeed + speedOffset / 2)
+            );
+        }
+    } // end of FixedUpdate method
 
     private void OnTriggerEnter(Collider other)
     {   
